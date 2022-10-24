@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>MapVGL</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map_container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            .panel {
+                position: absolute;
+                z-index: 99;
+                /*top: 10px;*/
+                right: 10px;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: #004E63;
+                width: 30%;
+                height: 20%;
+            }
+            .graph{
+			border-style:solid;
+			height:28px;
+			width:200px;
+			cursor:pointer;
+			text-align:center
+
+		} .graphDes{
+			font-size: 14px;
+			color:white;
+			white-space: nowrap;
+                line-height:120%;
+		}
+        </style>
+
+    <script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=1XjLLEhZhQNUzd93EjU5nOGQ"></script>
+    <script src="//mapv.baidu.com/build/mapv.min.js"></script>
+    <script src="./static/common.js"></script>
+    <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.151/dist/mapvgl.min.js"></script>
+    <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.151/dist/mapvgl.threelayers.min.js"></script>
+</head>
+<body>
+<div class="panel">
+            <span class="graph" style="font-size: 15px;margin:2px; color:#ff0000; cursor:pointer;" onclick="morning()">Morning Peak Orders</span>
+            <p class="graphDes" id="cruising_line">Click to hide morning peak orders</p>
+            <p class="graph" style="font-size: 15px;margin:2px; color:#00ff00; cursor:pointer" onclick="evening()">Evening Peak Orders</p>
+            <p class="graphDes" id="pickup_line">Click to hide evening peak orders</p>
+
+
+  </div>
+    <div id="map_container"></div>
+    <script>
+    /* global BMapGL */
+
+    /* global mapv */
+
+    /* global mapvgl */
+
+    /* global initMap */
+
+    /* global purpleStyle */
+
+    var map = initMap({
+        tilt: 41.8,
+        heading: 0,
+        center: [114.1694, 22.3193],
+        zoom: 13,
+        style: purpleStyle
+    });
+    var morning_peak_data = [];
+    var evening_peak_data = [];
+    var curve = new mapvgl.BezierCurve();
+var view = new mapvgl.View({
+        // postProcessing: new mapvgl.PostProcessing({
+        //     passes: [{
+        //         name: 'unrealBloom',
+        //         threshold: 0.0,
+        //         strength: 1.5,
+        //         radius: 1.0
+        //     }]
+        // }),
+        effects: [
+            new mapvgl.BrightEffect({
+                threshold: 0,
+                blurSize: 2,
+                clarity: 0.4
+            }),
+        ],
+        map: map
+    });
+
+var lineLayer_morning_1 = new mapvgl.LineTripLayer({
+        color: 'rgb(255, 255, 204)', // 飞线动画颜色
+        step: 0.3
+    });
+
+var lineLayer_morning_2 = new mapvgl.SimpleLineLayer({
+        blend: 'lighter',
+        color: 'rgba(255,0,0,0.6)' // 飞线颜色
+    });
+
+
+var lineLayer_evening_1 = new mapvgl.LineTripLayer({
+        color: 'rgb(255,188,14)', // 飞线动画颜色
+        step: 0.3
+    });
+
+var lineLayer_evening_2 = new mapvgl.SimpleLineLayer({
+        blend: 'lighter',
+        color: 'rgba(0,255,0,0.6)' // 飞线颜色
+    });
+    fetch('./hongkong/order_pair.json').then(function(rs) {
+    return rs.json();
+    }).then(function(rs) {
+        console.log(rs.length);
+        for (var i = 0; i <rs.length; i++) {
+            var single_order = rs[i];
+            // var startPoint = map.lnglatToMercator(single_order[0][1], single_order[0][0]);
+            // var endPoint = map.lnglatToMercator(single_order[1][1], single_order[1][0]);
+            current_time = single_order[0];
+            var startPoint = [single_order[1][1], single_order[1][0]];
+            var endPoint = [single_order[2][1], single_order[2][0]];
+            var start1 = gcoord.transform(
+                startPoint,    // 经纬度坐标
+                gcoord.WGS84,                 // 当前坐标系
+                gcoord.BD09                   // 目标坐标系
+            );
+                var end1 = gcoord.transform(
+                endPoint,    // 经纬度坐标
+                gcoord.WGS84,                 // 当前坐标系
+                gcoord.BD09                   // 目标坐标系
+            );
+            curve.setOptions({
+                start: start1,
+                end: end1
+
+            });
+            var curveModelData = curve.getPoints(50);
+            if(current_time < 43200){
+                morning_peak_data.push({
+                geometry: {
+                    type: 'LineString',
+                    coordinates: curveModelData
+                },
+                properties: {
+                    count: Math.random()
+                }
+            });
+            }
+            else if(current_time > 72000){
+                evening_peak_data.push({
+                geometry: {
+                    type: 'LineString',
+                    coordinates: curveModelData
+                },
+                properties: {
+                    count: Math.random()
+                }
+            });
+            }
+
+        }
+    view.addLayer(lineLayer_morning_1);
+    view.addLayer(lineLayer_evening_1);
+
+
+    lineLayer_morning_1.setData(morning_peak_data.map(item => {
+        item.geometry.coordinates = item.geometry.coordinates.map(item => {
+            item[2] += 3;
+            return item;
+        });
+        return item;
+    }));
+
+
+    view.addLayer(lineLayer_morning_2);
+    lineLayer_morning_2.setData(morning_peak_data);
+
+
+
+
+    lineLayer_evening_1.setData(evening_peak_data.map(item => {
+        item.geometry.coordinates = item.geometry.coordinates.map(item => {
+            item[2] += 3;
+            return item;
+        });
+        return item;
+    }));
+
+
+    view.addLayer(lineLayer_evening_2);
+    lineLayer_evening_2.setData(evening_peak_data);
+    });
+
+
+var morningJudge = true;
+var eveningJudge = true;
+function morning() {
+    // view.removeAllLayers();
+    if (!morningJudge){
+        view.showLayer(lineLayer_morning_1);
+        view.showLayer(lineLayer_morning_2);
+        c1 = document.getElementById('cruising_line');
+        c1.innerHTML = 'Click to hide morning peak orders';
+        morningJudge = true;
+    }
+    else{
+        view.hideLayer(lineLayer_morning_1);
+        view.hideLayer(lineLayer_morning_2);
+        c1 = document.getElementById('cruising_line');
+        c1.innerHTML = 'Click to show morning peak orders';
+
+        morningJudge = false;
+    }
+
+}
+function evening() {
+   if (!eveningJudge){
+        view.showLayer(lineLayer_evening_1);
+        view.showLayer(lineLayer_evening_2);
+        c2 = document.getElementById('pickup_line');
+        c2.innerHTML = 'Click to hide evening peak orders';
+        eveningJudge = true;
+    }
+    else{
+        view.hideLayer(lineLayer_evening_1);
+        view.hideLayer(lineLayer_evening_2);
+        eveningJudge = false;
+        c2 = document.getElementById('pickup_line');
+        c2.innerHTML = 'Click to show evening peak orders'
+    }
+
+}
+
+    </script>
+</body>
+</html>

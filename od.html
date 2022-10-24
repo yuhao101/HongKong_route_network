@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>MapVGL</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map_container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            .panel {
+                position: absolute;
+                z-index: 99;
+                /*top: 10px;*/
+                right: 10px;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: #004E63;
+                width: 30%;
+                height: 20%;
+            }
+            .graph{
+			border-style:solid;
+			height:28px;
+			width:200px;
+			cursor:pointer;
+			text-align:center
+
+		} .graphDes{
+			font-size: 14px;
+			color:white;
+			white-space: nowrap;
+                line-height:120%;
+		}
+        </style>
+
+    <script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=Zyq6TjFQ1679hxUWSUhud4i03GThAEGI"></script>
+  <script src="//mapv.baidu.com/build/mapv.min.js"></script>
+  <script src="./static/common.js"></script>
+  <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.119/dist/mapvgl.min.js"></script>
+
+</head>
+<body>
+<div class="panel">
+            <span class="graph" style="font-size: 15px;margin:2px; color:#ff0000; cursor:pointer;" onclick="morning()">Morning Peak Orders</span>
+            <p class="graphDes" id="cruising_line">Click to hide morning peak orders</p>
+            <p class="graph" style="font-size: 15px;margin:2px; color:#00ff00; cursor:pointer" onclick="evening()">Evening Peak Orders</p>
+            <p class="graphDes" id="pickup_line">Click to hide evening peak orders</p>
+
+
+  </div>
+    <div id="map_container"></div>
+    <script>
+    /* global BMapGL */
+
+    /* global mapv */
+
+    /* global mapvgl */
+
+    /* global initMap */
+
+    /* global purpleStyle */
+
+    var map = initMap();
+
+  var point = new BMapGL.Point(114.1694, 22.3193);
+  map.centerAndZoom(point, 13);
+
+  var view = new mapvgl.View({
+    map: map
+  });
+    var morning_peak_data = [];
+    var evening_peak_data = [];
+    var curve = new mapvgl.BezierCurve();
+
+
+var heatmap_morning = new mapvgl.HeatmapLayer({
+      size: 400, // 单个点绘制大小
+      max: 40, // 最大阈值
+      height: 0, // 最大高度，默认为0
+      unit: 'm', // 单位，m:米，px: 像素
+      gradient: { // 对应比例渐变色
+        0.25: 'rgba(0, 0, 255, 1)',
+        0.55: 'rgba(0, 255, 0, 1)',
+        0.85: 'rgba(255, 255, 0, 1)',
+        1: 'rgba(255, 0, 0, 1)'
+      }
+    });
+var heatmap_evening = new mapvgl.HeatmapLayer({
+      size: 400, // 单个点绘制大小
+      max: 40, // 最大阈值
+      height: 0, // 最大高度，默认为0
+      unit: 'm', // 单位，m:米，px: 像素
+      gradient: { // 对应比例渐变色
+        0.25: 'rgba(0, 0, 255, 1)',
+        0.55: 'rgba(0, 255, 0, 1)',
+        0.85: 'rgba(255, 255, 0, 1)',
+        1: 'rgb(6,255,35)'
+      }
+    });
+    fetch('./hongkong/order_pair_by_time.json').then(function(rs) {
+    return rs.json();
+    }).then(function(rs) {
+        var count = 0;
+        var morning_data = rs['morning'];
+        var evening_data = rs['evening'];
+        var max_length = Math.max(morning_data.length,evening_data.length);
+        var interval = setInterval(function () {
+            morning_peak_data = [];
+            evening_peak_data = [];
+            if(count < morning_data.length) {
+                for (var i = 0; i < morning_data[count].length; i++) {
+                    var single_order = morning_data[count][i];
+                    var startPoint = [single_order[0][1], single_order[0][0]];
+                    var start1 = gcoord.transform(
+                        startPoint,    // 经纬度坐标
+                        gcoord.WGS84,                 // 当前坐标系
+                        gcoord.BD09                   // 目标坐标系
+                    );
+                    morning_peak_data.push({
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [start1[0],start1[1]]
+                        },
+                        properties: {
+                            count: 10
+                        }
+                    });
+                    console.log(morning_peak_data)
+
+                }
+                view.addLayer(heatmap_morning);
+                heatmap_morning.setData(morning_peak_data);
+            }
+            if(count < evening_data.length) {
+                for (var i = 0; i < evening_data[count].length; i++) {
+                    var single_order = evening_data[count][i];
+                    var startPoint = [single_order[0][1], single_order[0][0]];
+                    var start1 = gcoord.transform(
+                        startPoint,    // 经纬度坐标
+                        gcoord.WGS84,                 // 当前坐标系
+                        gcoord.BD09                   // 目标坐标系
+                    );
+
+                    evening_peak_data.push({
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [start1[0],start1[1]]
+                        },
+                        properties: {
+                            count: 10
+                        }
+                    });
+
+                }
+                view.addLayer(heatmap_evening);
+                heatmap_evening.setData(evening_peak_data);
+            }
+            count += 1;
+            if(count >= max_length){
+                clearInterval(interval);
+            }
+        }, 5000);
+    });
+var morningJudge = true;
+var eveningJudge = true;
+function morning() {
+    // view.removeAllLayers();
+    if (!morningJudge){
+        view.showLayer(heatmap_morning);
+        c1 = document.getElementById('cruising_line');
+        c1.innerHTML = 'Click to hide morning peak orders';
+        morningJudge = true;
+    }
+    else{
+        view.hideLayer(heatmap_morning);
+        c1 = document.getElementById('cruising_line');
+        c1.innerHTML = 'Click to show morning peak orders';
+
+        morningJudge = false;
+    }
+
+}
+function evening() {
+   if (!eveningJudge){
+        view.showLayer(heatmap_evening);
+        c2 = document.getElementById('pickup_line');
+        c2.innerHTML = 'Click to hide evening peak orders';
+        eveningJudge = true;
+    }
+    else{
+        view.hideLayer(heatmap_evening);
+        eveningJudge = false;
+        c2 = document.getElementById('pickup_line');
+        c2.innerHTML = 'Click to show evening peak orders'
+    }
+
+}
+
+    </script>
+</body>
+</html>

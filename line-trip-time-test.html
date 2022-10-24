@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" >
+  <title>BMapGL</title>
+<!--  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" >-->
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map_container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            .panel {
+                position: absolute;
+                z-index: 99;
+                /*top: 10px;*/
+                right: 10px;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: #004E63;
+                width: 400px;
+                height: 450px;
+            }
+            .panel label {
+                font-size: 14px;
+                line-height: 2;
+            }
+            .panel .show {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                display: none;
+                padding: 5px 8px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+                color: rgba(84, 163, 223, 0.98);
+                border-radius: 6px;
+                background: #004E63;
+                cursor: pointer;
+                width: 80px;
+            }
+            .panel.hide {
+                visibility: hidden;
+            }
+            .panel.hide .show {
+                display: inline-block;
+                visibility: visible;
+                right: 10px;
+
+            }
+            .panel .close {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 14px;
+                color: rgba(84, 163, 223, 0.98);
+                cursor: pointer;
+            }
+            .create-button {
+                margin: 6px 0;
+            }
+            .graph{
+			border-style:solid;
+			height:28px;
+			width:130px;
+			cursor:pointer;
+			text-align:center
+
+		}
+            .graphDes{
+			font-size: 14px;
+			color:white;
+			white-space: nowrap;
+                line-height:20%;
+		}
+        </style>
+
+  <script type="text/javascript" src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=Zyq6TjFQ1679hxUWSUhud4i03GThAEGI"></script>
+  <script type="text/javascript" src="./static/common.js"></script>
+  <script type="text/javascript" src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.119/dist/mapvgl.min.js"></script>
+  <script src="//mapv.baidu.com/build/mapv.min.js"></script>
+
+</head>
+<body>
+<div id="map_container">
+</div>
+
+
+<script>
+
+  var map = initMap({
+          tilt: 60,
+          heading: 0,
+          // center: [-73.982316, 40.7730913],
+          center: [114.1694, 22.3193],
+          zoom: 14,
+          style: purpleStyle,
+          displayOptions: {
+              poi: false
+          },
+
+          skyColors: [
+              // 地面颜色
+              'rgba(226, 237, 248, 0)',
+              // 天空颜色
+              'rgba(186, 211, 252, 1)'
+          ]
+      });
+  var view = new mapvgl.View({
+    map: map
+  });
+var step = 2;
+  var timeOffset = 36000;
+    var cruisingLayer = new mapvgl.LineTripLayer({
+    step: step,
+    trailLength: 500,
+    startTime: 0,
+    endTime: 64800,
+  });
+  var pickupLayer = new mapvgl.LineTripLayer({
+    step: step,
+    trailLength: 500,
+    startTime: 0,
+    endTime: 64800,
+  });
+  var deliveryLayer = new mapvgl.LineTripLayer({
+    step:step,
+    trailLength: 500,
+    startTime: 0,
+    endTime: 64800,
+  });
+fetch('./hongkong/simulator_line.json').then(function(rs) {
+    return rs.json();
+  }).then(function(rs) {
+    rs = rs.data;
+    var cruisingdata = [];
+    var pickupdata = [];
+    var deliverydata = [];
+    for (var i = 0; i < 50000; i++) {
+      var type = rs[i].type;
+      var traj_list = rs[i].traj_list;
+      var time_list = rs[i].time_list;
+      var traj = [];
+      var timeArr = [];
+
+      for (var j = 0; j < time_list.length; j++) {
+        timeArr.push(time_list[j]);
+        node_point = [traj_list[j][1],traj_list[j][0]];
+        var bd_point = gcoord.transform(
+                node_point,    // 经纬度坐标
+                gcoord.WGS84,                 // 当前坐标系
+                gcoord.BD09                   // 目标坐标系
+            );
+        traj.push([
+          bd_point[0],
+          bd_point[1],
+          1,
+          time_list[j]- timeOffset
+        ]);
+      }
+      if (type === 1) {
+        deliverydata.push({
+        color: 'red',
+        time: timeArr,
+        geometry: {
+          type: 'LineString',
+          coordinates: traj
+        }
+      });
+      }
+      else if(type === 2) {
+          pickupdata.push({
+              color: 'green',
+              time: timeArr,
+              geometry: {
+                  type: 'LineString',
+                  coordinates: traj
+              }
+          });
+      }
+      else{
+          cruisingdata.push({
+              color: 'yellow',
+              time: timeArr,
+              geometry: {
+                  type: 'LineString',
+                  coordinates: traj
+              }
+          });
+          }
+  }
+  view.addLayer(cruisingLayer);
+  view.addLayer(pickupLayer);
+  view.addLayer(deliveryLayer);
+  console.log(pickupdata);
+  cruisingLayer.setData(cruisingdata);
+  pickupLayer.setData(pickupdata);
+  deliveryLayer.setData(deliverydata);
+});
+
+
+</script>
+
+</body>
+</html>

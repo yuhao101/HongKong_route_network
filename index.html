@@ -1,0 +1,417 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mobility-on-demand Simulator (Application to HK)</title>
+<!--设置是否为缩放模式 -->
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" /><!-- 新 Bootstrap 核心 CSS 文件 -->
+<link rel="stylesheet" type="text/css" href="https://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 --> 
+<script src="./static/js/jquery.min.js"></script>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 --> 
+<script src="./static/js/bootstrap.min.js"></script>
+<!--echarts JS-->
+<script src="./static/js/echarts.min.js"></script>
+<!-- 轮播swiper文件 -->
+<link rel="stylesheet" type="text/css" href="./static/css/swiper.min.css">
+<script src="./static/js/swiper.min.js"></script>
+<!--界面样式-->
+<script src="./static/js/visual2.js"></script>
+<!--<script src="js/visual3.js"></script>-->
+<script src="./static/js/china.js"></script>
+<script src="./static/js/chartMap.js"></script>
+<link rel="stylesheet" type="text/css" href="./static/css/visual.css">
+<script type="text/javascript" src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=Zyq6TjFQ1679hxUWSUhud4i03GThAEGI"></script>
+  <script type="text/javascript" src="./static/common.js"></script>
+  <script type="text/javascript" src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.119/dist/mapvgl.min.js"></script>
+  <script src="//mapv.baidu.com/build/mapv.min.js"></script>
+	<script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=1XjLLEhZhQNUzd93EjU5nOGQ"></script>
+
+
+	<style>
+		.arrow.arrow-left {
+
+			width: 0;
+
+			height: 0;
+
+			border-bottom: 15px solid transparent; /* 下边框的高 */
+
+			border-top: 15px solid transparent; /* 上方边框的高 */
+
+			border-right: 10px solid yellow; /* 右边框的长度|宽度，以及背景色 */
+
+			font-size: 0;
+
+			line-height: 0;
+
+		}
+		.graph{
+			border-style:solid;
+			height:28px;
+			width:150px;
+			cursor:pointer;
+			text-align:center
+
+		}
+		.graphDes{
+			font-size: 16px;
+			color:white;
+			white-space: nowrap;
+		}
+		.graphDesRight{
+			font-size: 16px;
+			color:white;
+			padding-top:30px
+		}
+
+	</style>
+</head>
+<body class="ksh">
+	<div id="load">
+		<div class="load_img"><!-- 加载动画 -->
+			<img class="jzxz1" src="./static/images/jzxz1.png">
+			<img class="jzxz2" src="./static/images/jzxz2.png">
+		</div>
+	</div>
+	<div class="head_top" style="cursor:pointer;">
+		<img class="img-responsive" src="./static/images/jcdsj_logo.png">
+		<p style="font-size: 30px; font-weight: bolder;text-decoration:underline;">Mobility-on-demand Simulator System
+			<span >Application to HK</span>
+		</p>
+	</div>
+	<div class="visual">
+		<div class="visual_left">
+			<div class="visual_box" style="height: 5%;">
+				<div class="visual_title">
+					<span style="font-size: 26px;text-decoration:underline;">Hourly system metrics</span>
+				</div>
+			</div>
+			<div class="visual_box">
+<!--				<div class="visual_title">-->
+<!--					<span>Completed orders in different periods</span>-->
+<!--					<img src="images/ksh33.png">-->
+<!--				</div>-->
+				<div class="visual_chart" id="main1">
+				</div>
+				<div class="visual_title">
+					<span>Completed orders in different periods</span>
+				</div>
+
+			</div>
+			<div class="visual_box">
+<!--				<div class="visual_title">-->
+<!--					<span>Driver-side metrics</span>-->
+<!--					<img src="images/ksh33.png">-->
+<!--				</div>-->
+				<div class="visual_chart" id="main2">
+					
+				</div>
+				<div class="visual_title">
+					<span>Driver-side average metrics</span>
+				</div>
+			</div>
+			<div class="visual_box">
+<!--				<div class="visual_title">-->
+<!--					<span>Passenger-side metrics</span>-->
+<!--					<img src="images/ksh33.png">-->
+<!--				</div>-->
+				<div class="visual_chart" id="main21">
+
+				</div>
+				<div class="visual_title">
+					<span>Passenger-side average metrics</span>
+<!--					<img src="images/ksh33.png">-->
+				</div>
+			</div>
+
+		</div>
+		<div class="visual_con">
+			<div class="visual_conTop">
+				<div class="visual_conTop_box visual_conTop1">
+					<div >
+						<h3 style="font-size: 20px; padding-top: 10%;cursor: pointer" onclick="trajectory_map()">Vehicle trajectory</h3>
+					</div>
+				</div>
+				<div class="visual_conTop_box visual_conTop2">
+					<div>
+					<h3 style="font-size: 20px; padding-top: 10%;cursor: pointer" onclick="node_map()">Vehicle movement (macro)</h3>
+					</div>
+				</div>
+				<div class="visual_conTop_box visual_conTop1">
+					<div>
+					<h3 style="font-size: 20px; padding-top: 10%;cursor: pointer" onclick="car_map()">Vehicle movement (micro)</h3>
+					</div>
+				</div>
+				<div class="visual_conTop_box visual_conTop2">
+					<div>
+					<h3 style="font-size: 20px; padding-top: 10%;cursor: pointer" onclick="od_demand()">Origin-destination demand</h3>
+					</div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div class="visual_conBot" id="content">
+				<img class="visual_conBot_l" src="./static/images/ksh42.png">
+				<img class="visual_conBot_2" src="./static/images/ksh43.png">
+				<img class="visual_conBot_3" src="./static/images/ksh44.png">
+				<img class="visual_conBot_4" src="./static/images/ksh45.png">
+<!--				<div class="visual_chart_text">-->
+<!--					<h1>Travel Service</h1>-->
+<!--					<h2>Traffic big data analysis platform</h2>-->
+<!--				</div>-->
+				<div class="visual_chart" id="map_container">
+				</div>
+			</div>
+		</div>
+		<div class="visual_right">
+			<div class="visual_box_long visualSfzsfl">
+				<div class="visual_title">
+					<span style="font-size: 26px;text-decoration:underline;">Real-time system metrics</span>
+				</div>
+				<div class="visual_title">
+					<span style="font-size: 18px;text-decoration:underline;">Driver-side metrics </span>
+
+					<br>
+					<span>Percentage of vehicles in different status</span>
+					<br>
+<!--					<span id="matching rate" style="margin:2px;color:white">Matching rate: 0</span>-->
+<!--					<br>-->
+					<span id="delivery ratio" style="margin:2px;color:red">Delivery: 0</span>
+					<br>
+					<span id="pickup ratio" style="margin:2px;color:green">Pickup: 0</span>
+					<br>
+					<span id="idle ratio" style="margin:2px;color:yellow">Idle: 0</span>
+					<br>
+					<br>
+					<div style="padding-top: 7%;">
+					<span style="font-size: 18px;text-decoration:underline;">Passengers-side metrics </span>
+
+					<br>
+					<span id="waiting time" style="margin:2px;color:white">Waiting time for matching: 0s</span>
+					<br>
+					<span id="pickup time" style="margin:2px;color:white">Waiting time for pickup: 0s</span>
+					<br>
+
+					<div class="visualSssf_left" style="text-align: center; padding-top: 7%">
+						<h3 id="time" style="width:33%;float:left;line-height:85px;color:#20dbfd;text-shadow:0 0 25px
+						#00d8ff;font-size:46px;font-family: 'yjsz';text-align:right;">Time</h3>
+					</div>
+						</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="clear"></div>
+	</div>
+	<script>
+
+		$(function(){
+			var a=$('.visualSssf_left a');
+			for(var i=0;i<a.length;i++){
+				a[i].index=i;
+				a[i].onclick=function(){
+					for(var i=0;i<a.length;i++){
+						a[i].className=''
+						}
+					this.className='active'
+				}
+			}
+
+			var sfzcllH=$('.sfzcll_box').height();
+			var sfzcllHtwo=sfzcllH-2;
+			$('.sfzcll_box').css('line-height',sfzcllH+'px');
+			$('.sfzcll_smallBk>div').css('line-height',sfzcllHtwo+'px');
+
+			//删除加载动画
+			$('#load').fadeOut(1000);
+    		setTimeout(function(){
+    			$('#load').remove()
+    		}
+    		,1100);
+		});
+
+var count = 1;
+// var panel =
+// [[0.9597400086400517, 0.9284936583391741, 0.9133551211368733, 0.922132681439626, 0.9253098993089535, 0.9324087819332454, 0.9243541331243148, 0.9220185780633982, 0.9147542616424984, 0.9156650110148477, 0.9226605959471905, 0.9279352252134632], [724, 1510, 2294, 3041, 3756, 4395, 4975, 5600, 6296, 7107, 7791, 8483], [45, 152, 203, 260, 285, 313, 432, 460, 610, 620, 628, 636], [0.06110069444444456, 0.07011736111111122, 0.073377777777778, 0.0712243055555558, 0.06874375000000021, 0.06603333333333329, 0.06250694444444431, 0.0605604166666666, 0.06517916666666687, 0.08003819444444461, 0.06641041666666679, 0.06784236111111125], [0.04908055555555558, 0.0890180555555557, 0.08430555555555583, 0.0831916666666669, 0.07833472222222236, 0.07129930555555554, 0.07452013888888896, 0.07085277777777799, 0.07849236111111134, 0.09836527777777745, 0.08075416666666685, 0.07927916666666701], [0.8898187500000011, 0.8408645833333304, 0.8423166666666673, 0.8455840277777776, 0.8529215277777796, 0.8626673611111136, 0.8629729166666695, 0.8685868055555566, 0.8563284722222215, 0.8215965277777758, 0.8528354166666676, 0.8528784722222238], [14.666161488669452, 30.768588376984376, 44.62806580798934, 33.06717598215866, 32.067110989858016, 22.768689861388395, 57.01594734952137, 46.98370468405998, 59.07011382829559, 23.273276793057832, 12.126427425314324, 11.343769321400908], [702.0551411084369, 677.6501767423256, 686.3203139387223, 697.3660211288479, 695.1071752486805, 784.8609795930947, 736.0293962314984, 685.8039720662406, 712.5524316907916, 664.731697196513, 683.5312223501576, 631.9105746564428]]
+var time = ['11:00', '12:00','13:00', '14:00','15:00', '16:00','17:00', '18:00','19:00', '20:00','21:00', '22:00'];
+var chartDom = document.getElementById('main1');
+var myChart = echarts.init(chartDom);
+var myChart2 = echarts.init(document.getElementById('main2'));
+myChart2.setOption(option2);
+var myChart21 = echarts.init(document.getElementById('main21'));
+myChart21.setOption(option21);
+
+var interval = setInterval(function () {
+	if (count > 2) {
+		myChart.setOption({
+			xAxis: [
+				{
+					data: time.slice(0, count)
+				}
+			],
+			series: [
+				{
+					data: panel[1].slice(0, count)
+				},
+				{
+					data: panel[2].slice(0, count)
+				}
+			]
+		});
+		myChart2.setOption({
+			xAxis: [
+				{
+					data: time.slice(0, count)
+				}
+			],
+			series: [
+				{
+					data: panel[3].slice(0, count)
+				},
+				{
+					data: panel[4].slice(0, count)
+				},
+				{
+					data: panel[5].slice(0, count)
+				}
+			]
+		});
+		myChart21.setOption({
+			xAxis: [
+				{
+					data: time.slice(0, count)
+				}
+			],
+			series: [
+				{
+					data: panel[6].slice(0, count)
+				},
+				{
+					data: panel[7].slice(0, count)
+				}
+			]
+		});
+	}
+  	count += 1;
+if(count===16){
+	clearInterval(interval);
+
+}
+}, 60000);
+
+myChart.setOption(option1);
+
+	//交通流量
+	// let myChart1 = echarts.init(document.getElementById('main1'));
+    // myChart1.setOption(option1);
+	//交通工具流量
+
+
+    // var myChart41 = echarts.init(document.getElementById('main41'));
+    // myChart41.setOption(option41);
+
+    //今日实时收费
+	let executeTime = 12;
+
+	let startTime = 0;
+	fetch('./hongkong/simulator_metrics.json').then(function(rs) {
+    return rs.json();
+  }).then(function(rs) {
+      cTime = document.getElementById('time');
+      // p1 = document.getElementById('matching rate');
+      p2 = document.getElementById('pickup ratio');
+      p3 = document.getElementById('delivery ratio');
+      p4 = document.getElementById('idle ratio');
+      for (var i = 0; i < 4320; i++) {
+          (function (num) {
+              setTimeout(function () {
+                  current_time = (num+startTime) * 5 + 36000;
+                  cTime.innerHTML = 'Time: ' + sToHms((num+startTime) * 5 + 36000);
+                  // p1.innerHTML = 'Matching Rate: ' + (rs[num * 5 + 36000][0]*100).toFixed(2) +'%';
+                  p2.innerHTML = '---- Pickup: ' + (rs[(num+startTime) * 5 + 36000][3]*100).toFixed(2) +'%';
+                  p3.innerHTML = '---- Delivery: ' + (rs[(num+startTime) * 5 + 36000][4]*100).toFixed(2) +'%';
+                  p4.innerHTML = '---- Idle: ' + (rs[(num+startTime) * 5 + 36000][5]*100).toFixed(2) +'%';
+                  // if(num > 5760){
+                  // 	executeTime = 1;
+				  // }
+              }, num * (1000/(executeTime)));
+          })(i);
+      }
+  });
+    fetch('./hongkong/simulator_metrics_passenger.json').then(function(rs) {
+    return rs.json();
+  }).then(function(rs) {
+      p5 = document.getElementById('waiting time');
+      p6 = document.getElementById('pickup time');
+      for (i = 0; i < 4320; i ++) {
+          (function (num) {
+              setTimeout(function () {
+                  p5.innerHTML = 'Waiting time for matching: ' + rs[(num+startTime) * 5 + 36000][0].toFixed(2) +'s';
+                  p6.innerHTML = 'Waiting time for pickup: ' + rs[(num+startTime) * 5 + 36000][1].toFixed(2)+'s';
+              }, num * (1000/(executeTime)));
+          })(i);
+      }
+  });
+	</script>
+<script>
+
+function sToHms(s){
+      s = Math.floor(s);  //如果输入的是浮点数，则舍弃小数位
+
+      var h = Math.floor(s/3600);  //计算得出小时数
+      if(h<10){  //调整为两位数的格式
+        h = '0'+h;
+      }
+
+      var m = Math.floor(s/60-h*60);  //计算得出分钟数
+      if(m<10){  //调整为两位数的格式
+        m = '0'+m;
+      }
+
+      var s = s%60;  //计算得出剩下的秒数
+      if(s<10){  //调整为两位数的格式
+        s = '0'+s;
+      }
+
+      return h+':'+m+':'+s;  //最后连接成字符串并返回
+    }
+
+function node_map() {
+	$.ajax({
+	url : "node-trip-time.html",
+	success : function (data) {
+    $("#content").html(data);
+	}
+	});
+}
+
+function car_map() {
+	$.ajax({
+	url : "car-line-more.html",
+	success : function (data) {
+    $("#content").html(data);
+	}
+	});
+}
+function trajectory_map() {
+	$.ajax({
+	url : "line-trip-time-test.html",
+	success : function (data) {
+    $("#content").html(data);
+	}
+	});
+}
+function od_demand() {
+	$.ajax({
+	url : "od的副本.html",
+	success : function (data) {
+    $("#content").html(data);
+	}
+	});
+}
+trajectory_map();
+
+</script>
+</body>
+
+</html>

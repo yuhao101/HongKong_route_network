@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>MapVGL</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map_container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            .panel {
+                position: absolute;
+                z-index: 99;
+                /*top: 10px;*/
+                right: 10px;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: #004E63;
+                width: 25%;
+                height: 23%;
+            }
+            .graph{
+			border-style:solid;
+			height:28px;
+			width:160px;
+			cursor:pointer;
+			text-align:center
+
+		}.graphDes{
+			font-size: 14px;
+			color:white;
+			white-space: nowrap;
+                line-height:120%;
+		}
+        </style>
+</head>
+<body>
+<!--<div class="panel">-->
+<!--            <label style="color:white; font-size: 16px">Different line color</label>-->
+<!--            <span class="graph" style="font-size: 15px;margin:2px; color:yellow; cursor:pointer;" onclick="Cruising()">&#45;&#45;&#45;&#45; Cruising</span>-->
+<!--            <p class="graphDes" id="cruising_line">Click to hide cruising line</p>-->
+<!--            <p class="graph" style="font-size: 15px;margin:2px; color:green; cursor:pointer" onclick="Pickup()">&#45;&#45;&#45;&#45; Pickup</p>-->
+<!--            <p class="graphDes" id="pickup_line">Click to hide pickup line</p>-->
+<!--            <p class="graph" style="font-size: 15px;margin:2px; color:red; cursor:pointer" onclick="Delivery()">&#45;&#45;&#45;&#45; Delivery</p>-->
+<!--            <p class="graphDes" id="delivery_line">Click to hide delivery line</p>-->
+
+<!--  </div>-->
+<div class="panel">
+            <span class="graph" style="font-size: 15px;margin:4px; color:yellow; cursor:pointer;">&nbsp&nbsp<img style="width:60px;height:25px;" src="./static/yellow.jpg">&nbsp&nbspCruising</span>
+            <p class="graph" style="font-size: 15px;margin:4px; color:green; cursor:pointer"><img style="width:60px;height:25px;" src="./static/green.jpg">&nbsp&nbspPickup</p>
+            <p class="graph" style="font-size: 15px;margin:4px; color:red; cursor:pointer">&nbsp<img style="width:60px;height:25px;" src="./static/red.jpg">&nbsp&nbspDelivery</p>
+
+  </div>
+<div id="map_container"></div>
+<script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=Zyq6TjFQ1679hxUWSUhud4i03GThAEGI"></script>
+<script src="./static/common.js"></script>
+<script src="//mapv.baidu.com/build/mapv.min.js"></script>
+<script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.119/dist/mapvgl.min.js"></script>
+<script>
+
+  /* eslint-disable */
+  /* global BMapGL */
+
+  /* global mapv */
+
+  /* global mapvgl */
+
+  /* global initMap */
+
+  /* global whiteStyle */
+
+  var map = initMap({
+    tilt: 60,
+    heading: 0,
+    // center: [116.308528,40.050574],
+    center: [114.181221, 22.3004369],
+    // center: [106.521831,29.571811],
+    zoom: 16,
+    // style: whiteStyle,
+    displayOptions: {
+      poi: false
+    },
+    style: purpleStyle,
+    skyColors: [
+      // 地面颜色
+      'rgba(226, 237, 248, 0)',
+      // 天空颜色
+      'rgba(186, 211, 252, 1)'
+    ]
+  });
+
+  var view = new mapvgl.View({
+    map: map
+  });
+var step = 3;
+var cruisingLayer = new mapvgl.CarLineLayer({
+    url: './static/yellow_car.gltf',
+    autoPlay: true,
+    step: step,
+    scale: 20,
+    });
+// var traj_list = [[114.181221, 22.3044369],[114.180221, 22.3024369],[114.181675, 22.293215], [114.182605, 22.287711],[114.183015, 22.284615],[114.18204, 22.28261]]
+  var traj_list = [[114.18234, 22.28306], [114.183085,22.283752], [114.182428,22.289054], [114.181373,22.294889],[114.180808,22.298419],[114.1807029, 22.3037154]]
+ // var traj_list = [[114.1590512, 22.3036855], [114.152923, 22.297185],[114.148813, 22.292717],[114.146193, 22.289888],[114.143574, 22.289391],[114.142394, 22.2897197]]
+// var traj_list = [[114.14246, 22.28986],[114.144823,22.289325],[114.146142,22.289908], [114.1575932, 22.3024532]]
+// var traj_list = [[114.1297249, 22.3210497],[114.127613, 22.320299],[114.125500, 22.320604], [114.123762, 22.321733],[114.117984, 22.326252],[114.1133518, 22.3295913]]
+// var traj_list = [[114.113875, 22.3294957],[114.117464,22.326388],[114.119872,22.324585],[114.126435,22.320290],[ 114.128384,22.320290], [114.1296272, 22.3212047]]
+
+var traj_list = [[22.3238852, 114.2274552], [22.3238715, 114.2267323], [22.3234167, 114.2257487], [22.3229168, 114.2257004], [22.3226724, 114.22586], [22.3226026, 114.2258946], [22.3225672, 114.2258091], [22.3224375, 114.2253725], [22.3210467, 114.2241925], [22.3202918, 114.2237892], [22.3212089, 114.221557], [22.3229275, 114.2176546], [22.3227531, 114.216947], [22.3226364, 114.2164685], [22.3232133, 114.2162934], [22.323634, 114.2160524], [22.3238726, 114.2158724], [22.3251596, 114.2149343], [22.3256229, 114.210936], [22.3254693, 114.2096742], [22.3254395, 114.2089373], [22.325419, 114.2086275], [22.3253806, 114.2081889], [22.3252243, 114.2064106], [22.3251887, 114.205989], [22.3253092, 114.2059777], [22.3256012, 114.2059364], [22.326026, 114.2058952], [22.3259153, 114.2046807], [22.3262438, 114.2046567], [22.3267987, 114.2043447], [22.326962, 114.2041637], [22.3269148, 114.203476], [22.3245998, 114.1993477], [22.3245624, 114.1992491], [22.3221804, 114.1945743], [22.3220755, 114.1945189], [22.3221186, 114.1944206], [22.323359, 114.1914466], [22.3235027, 114.1911423], [22.323929, 114.1902612], [22.3240422, 114.1900113], [22.3241102, 114.1898611], [22.3243693, 114.1893462], [22.3246187, 114.1888626], [22.3246775, 114.1887567], [22.3248955, 114.1882407], [22.3251367, 114.1872033], [22.3256126, 114.1868761], [22.3248939, 114.1856714], [22.3239891, 114.1837308], [22.3225868, 114.180633], [22.3203475, 114.1752446], [22.3202456, 114.1747013], [22.3201526, 114.1742344], [22.3201214, 114.174072], [22.3199666, 114.1732154], [22.3198817, 114.1727535], [22.3198547, 114.1726227], [22.3197792, 114.1722279], [22.3196999, 114.1717118], [22.3196876, 114.1716362], [22.3195896, 114.171086], [22.3193945, 114.1699774], [22.3193887, 114.1698853], [22.3193121, 114.1694289], [22.319293, 114.16932], [22.3191904, 114.1687163], [22.3191379, 114.1683979], [22.3190943, 114.1681318], [22.3190063, 114.1676802], [22.3188372, 114.166776], [22.3188085, 114.1666259], [22.3187352, 114.1662215], [22.318712, 114.1660608], [22.3186882, 114.1654077], [22.3185627, 114.1637721], [22.3184081, 114.1633208], [22.3183111, 114.163129], [22.3182686, 114.1630453], [22.3181394, 114.1627874], [22.3180797, 114.1624903], [22.3175995, 114.1611738], [22.317115, 114.1608432], [22.3151599, 114.1615935], [22.3141818, 114.1617946], [22.3122102, 114.1619482], [22.3094109, 114.1615487], [22.3079408, 114.1612114], [22.3036855, 114.1590512], [22.297185, 114.152923], [22.292717, 114.148813], [22.289888, 114.146193], [22.289391, 114.143574]]
+  var traj = [];
+var cruisingdata = [];
+for (var j = 0; j < traj_list.length; j++) {
+node_point = [traj_list[j][1],traj_list[j][0]];
+console.log(node_point);
+var bd_point = gcoord.transform(
+        node_point,    // 经纬度坐标
+        gcoord.WGS84,                 // 当前坐标系
+        gcoord.BD09                   // 目标坐标系
+    );
+traj.push([
+  bd_point[0],
+  bd_point[1],
+]);
+}
+cruisingdata.push({
+geometry: {
+  type: 'LineString',
+  coordinates: traj
+}
+});
+view.addLayer(cruisingLayer);
+
+cruisingLayer.setData(cruisingdata);
+
+
+</script>
+</body>
+</html>

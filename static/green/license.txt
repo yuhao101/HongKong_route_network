@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hyundai Pony1 Taxi
+* source:	https://sketchfab.com/3d-models/hyundai-pony1-taxi-04b1bede9039489eb7a8695e33e9e35a
+* author:	ANdrewsss (https://sketchfab.com/ANdrewsss)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hyundai Pony1 Taxi" (https://sketchfab.com/3d-models/hyundai-pony1-taxi-04b1bede9039489eb7a8695e33e9e35a) by ANdrewsss (https://sketchfab.com/ANdrewsss) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

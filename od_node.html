@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map_container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            .panel {
+                position: absolute;
+                z-index: 99;
+                /*top: 10px;*/
+                right: 10px;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: #004E63;
+                width: 30%;
+                height: 20%;
+            }
+            .graph{
+			border-style:solid;
+			height:28px;
+			width:200px;
+			cursor:pointer;
+			text-align:center
+
+		} .graphDes{
+			font-size: 14px;
+			color:white;
+			white-space: nowrap;
+                line-height:120%;
+		}
+        </style>
+</head>
+<body>
+<div class="panel">
+            <span class="graph" style="font-size: 15px;margin:2px; color:#ff0000; cursor:pointer;" onclick="morning()">Morning Peak Orders</span>
+            <p class="graphDes" id="cruising_line">Click to hide morning peak orders</p>
+            <p class="graph" style="font-size: 15px;margin:2px; color:#00ff00; cursor:pointer" onclick="evening()">Evening Peak Orders</p>
+            <p class="graphDes" id="pickup_line">Click to hide evening peak orders</p>
+
+
+  </div>
+
+    <div id="map"></div>
+    <canvas id="canvas"></canvas>
+    <script type="text/javascript" src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=Zyq6TjFQ1679hxUWSUhud4i03GThAEGI"></script>
+
+    <script type="text/javascript" src="//apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=1XjLLEhZhQNUzd93EjU5nOGQ"></script>
+    <script type="text/javascript" src="./static/mapv.js"></script>
+
+    <script type="text/javascript">
+
+        // 百度地图API功能
+        var map = new BMap.Map("map", {
+            enableMapClick: false
+        });    // 创建Map实例
+        map.centerAndZoom(new BMap.Point(114.1694, 22.3193), 13);  // 初始化地图,设置中心点坐标和地图级别
+        map.enableScrollWheelZoom(true); // 开启鼠标滚轮缩放
+
+        // 地图自定义样式
+        map.setMapStyle({
+            styleJson: [{
+                "featureType": "water",
+                "elementType": "all",
+                "stylers": {
+                    "color": "#044161"
+                }
+            }, {
+                "featureType": "land",
+                "elementType": "all",
+                "stylers": {
+                    "color": "#091934"
+                }
+            }, {
+                "featureType": "boundary",
+                "elementType": "geometry",
+                "stylers": {
+                    "color": "#064f85"
+                }
+            }, {
+                "featureType": "railway",
+                "elementType": "all",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "highway",
+                "elementType": "geometry",
+                "stylers": {
+                    "color": "#004981"
+                }
+            }, {
+                "featureType": "highway",
+                "elementType": "geometry.fill",
+                "stylers": {
+                    "color": "#005b96",
+                    "lightness": 1
+                }
+            }, {
+                "featureType": "highway",
+                "elementType": "labels",
+                "stylers": {
+                    "visibility": "on"
+                }
+            }, {
+                "featureType": "arterial",
+                "elementType": "geometry",
+                "stylers": {
+                    "color": "#004981",
+                    "lightness": -39
+                }
+            }, {
+                "featureType": "arterial",
+                "elementType": "geometry.fill",
+                "stylers": {
+                    "color": "#00508b"
+                }
+            }, {
+                "featureType": "poi",
+                "elementType": "all",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "green",
+                "elementType": "all",
+                "stylers": {
+                    "color": "#056197",
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "subway",
+                "elementType": "all",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "manmade",
+                "elementType": "all",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "local",
+                "elementType": "all",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "arterial",
+                "elementType": "labels",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "boundary",
+                "elementType": "geometry.fill",
+                "stylers": {
+                    "color": "#029fd4"
+                }
+            }, {
+                "featureType": "building",
+                "elementType": "all",
+                "stylers": {
+                    "color": "#1a5787"
+                }
+            }, {
+                "featureType": "label",
+                "elementType": "all",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }, {
+                "featureType": "poi",
+                "elementType": "labels.text.fill",
+                "stylers": {
+                    "color": "#ffffff"
+                }
+            }, {
+                "featureType": "poi",
+                "elementType": "labels.text.stroke",
+                "stylers": {
+                    "color": "#1e1c1c"
+                }
+            }, {
+                "featureType": "administrative",
+                "elementType": "labels",
+                "stylers": {
+                    "visibility": "off"
+                }
+            },{
+                "featureType": "road",
+                "elementType": "labels",
+                "stylers": {
+                    "visibility": "off"
+                }
+            }]
+        });
+var mapvLayer;
+        var mapvLayer2;
+        $.get('./hongkong/order_node_by_time.json', function (rs) {
+
+            var timeData = [];
+            var morning_base = 36000;
+            var evening_base = 72000;
+
+            var morning_data = rs['morning'];
+            var evening_data = rs['evening'];
+            for (var i = 0; i < morning_data.length; i++) {
+                var time = morning_data[i].time;
+                var traj = morning_data[i].traj;
+                for (j = 0; j < time.length; j += 1) {
+                    node_point = [traj[j][1],traj[j][0]];
+                    var bd_point = gcoord.transform(
+                            node_point,    // 经纬度坐标
+                            gcoord.WGS84,                 // 当前坐标系
+                            gcoord.BD09                   // 目标坐标系
+                        );
+
+                        timeData.push({
+                        fillStyle: 'red',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [bd_point[0], bd_point[1]]
+                        },
+                        count: 1,
+                        time: time[j] - morning_base
+                    })
+                }
+            }
+            var morning_dataSet = new mapv.DataSet(timeData);
+
+            var options = {
+                coordType: 'GCJ02',
+                globalCompositeOperation: "lighter",
+                size: 2,
+                animation: {
+                    trails: 200,
+                    duration: 80,
+                },
+                draw: 'simple'
+            };
+            mapvLayer = new mapv.baiduMapLayer(map, morning_dataSet, options);
+            timeData = [];
+
+            for (var i = 0; i < evening_data.length; i++) {
+                var time = evening_data[i].time;
+                var traj = evening_data[i].traj;
+                for (j = 0; j < time.length; j += 1) {
+                    node_point = [traj[j][1],traj[j][0]];
+                    var bd_point = gcoord.transform(
+                            node_point,    // 经纬度坐标
+                            gcoord.WGS84,                 // 当前坐标系
+                            gcoord.BD09                   // 目标坐标系
+                        );
+
+                        timeData.push({
+                        fillStyle: 'green',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [bd_point[0], bd_point[1]]
+                        },
+                        count: 1,
+                        time: time[j] - evening_base
+                    })
+                }
+            }
+            var evening_dataSet = new mapv.DataSet(timeData);
+
+            var options2 = {
+                coordType: 'GCJ02',
+                globalCompositeOperation: "lighter",
+                size: 2,
+                animation: {
+                    trails: 200,
+                    duration: 80,
+                },
+                draw: 'simple'
+            };
+            mapvLayer2 = new mapv.baiduMapLayer(map, evening_dataSet, options2);
+        });
+var morningJudge = true;
+var eveningJudge = true;
+function morning() {
+    // view.removeAllLayers();
+    if (!morningJudge){
+        mapvLayer.show();
+        c1 = document.getElementById('cruising_line');
+        c1.innerHTML = 'Click to hide morning peak orders';
+        morningJudge = true;
+    }
+    else{
+        mapvLayer.hide();
+        c1 = document.getElementById('cruising_line');
+        c1.innerHTML = 'Click to show morning peak orders';
+
+        morningJudge = false;
+    }
+
+}
+function evening() {
+   if (!eveningJudge){
+        mapvLayer2.show();
+        c2 = document.getElementById('pickup_line');
+        c2.innerHTML = 'Click to hide evening peak orders';
+        eveningJudge = true;
+    }
+    else{
+        mapvLayer2.hide();
+        eveningJudge = false;
+        c2 = document.getElementById('pickup_line');
+        c2.innerHTML = 'Click to show evening peak orders'
+    }
+
+}
+
+        </script>
+	
+</body>
+</html>
