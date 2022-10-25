@@ -127,7 +127,6 @@ var deliveryLayer = new mapvgl.CarLineLayer({
   fetch('./hongkong/simulator_car_adjust.json').then(rs => {
     return rs.json();
   }).then(rs => {
-    rs = rs.data;
     var cruisingdata = [];
     var pickupdata = [];
     var deliverydata = [];

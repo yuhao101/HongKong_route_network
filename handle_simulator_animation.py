@@ -22,25 +22,25 @@ import osmnx as ox
 
 def split_total_simulator_result():
     raw_data = json.load(open('./hongkong/simulator_animation_adjust.json', 'r'))['data']
-    line_trajectory_data = {'data':[]}
-    node_trajectory_data = {'data':[]}
-    car_trajectory_data = {'data':[]}
+    line_trajectory_data = []
+    node_trajectory_data = []
+    car_trajectory_data = []
     try:
         for item in raw_data:
             if item['time_list'][0]>72000:
-                car_trajectory_data['data'].append(item)
+                car_trajectory_data.append(item)
             elif item['time_list'][0]>64800:
-                node_trajectory_data['data'].append(item)
+                node_trajectory_data.append(item)
             else:
-                line_trajectory_data['data'].append(item)
+                line_trajectory_data.append(item)
     except:
         print(item)
     file = open('./hongkong/simulator_line.json', 'w')
-    file.write(json.dumps(line_trajectory_data, indent=1, ensure_ascii=False))
+    file.write(json.dumps(line_trajectory_data[:12000], indent=1, ensure_ascii=False))
     file = open('./hongkong/simulator_node.json', 'w')
-    file.write(json.dumps(node_trajectory_data, indent=1, ensure_ascii=False))
+    file.write(json.dumps(node_trajectory_data[:10000], indent=1, ensure_ascii=False))
     file = open('./hongkong/simulator_car.json', 'w')
-    file.write(json.dumps(car_trajectory_data, indent=1, ensure_ascii=False))
+    file.write(json.dumps(car_trajectory_data[:10000], indent=1, ensure_ascii=False))
 
 
 def adjust_route():
@@ -415,5 +415,5 @@ def extract_pickup_cruising_data():
 if __name__ == '__main__':
     # adjust_route()
     # handle_route_test()
-    # split_total_simulator_result()
-    extract_pickup_cruising_data()
+    split_total_simulator_result()
+    # extract_pickup_cruising_data()

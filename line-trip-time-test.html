@@ -144,7 +144,6 @@ var step = 2;
 fetch('./hongkong/simulator_line.json').then(function(rs) {
     return rs.json();
   }).then(function(rs) {
-    rs = rs.data;
     var cruisingdata = [];
     var pickupdata = [];
     var deliverydata = [];
